@@ -1,0 +1,28 @@
+LET times = (FOR p IN raw
+  FILTER p.size.size == 'big'
+     AND p.configuration.mode == 'single'
+     AND p.configuration.edition == 'enterprise'
+     AND p.configuration.name in @branches
+  SORT
+    p.ms
+  COLLECT
+    test = p.test.name,
+    configuration = p.configuration.name
+  INTO
+    list = [ p.ms, p.test.median ]
+  RETURN {
+    test,
+    configuration,
+    times: list[*][0],
+    values: list[*][1]
+  })
+
+FOR p IN times
+  COLLECT
+    test = p.test
+  INTO
+    list = p
+  RETURN {
+    test,
+    list
+  }

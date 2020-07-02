@@ -1,0 +1,17 @@
+{
+  "fields": [
+    {
+      "config": {},
+      "name": "NAME1",
+      "type": "number",
+      "values": []
+    },
+    {
+      "config": {},
+      "name": "Time",
+      "type": "time",
+      "values": []
+    }
+  ],
+  "name": "NAME1"
+}

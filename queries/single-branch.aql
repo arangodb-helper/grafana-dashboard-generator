@@ -1,0 +1,15 @@
+FOR p IN raw
+  FILTER p.ms >= @start
+     AND p.size.size == 'big'
+     AND p.configuration.mode == 'single'
+     AND p.configuration.name == '3.4'
+     AND p.configuration.edition == 'enterprise'
+  COLLECT
+    test = p.test.name
+  INTO
+    list = [ p.ms, p.test.median ]
+  return {
+    test,
+    times: list[*][0],
+    values: list[*][1]
+  }

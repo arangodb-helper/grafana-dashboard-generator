@@ -1,0 +1,38 @@
+{
+  "dashboard": {
+    "editable": false,
+    "graphTooltip": 0,
+    "links": [],
+    "panels": [],
+    "refresh": false,
+    "schemaVersion": 22,
+    "snapshot": {
+      "originalUrl": "SNAPSHOT-LINK",
+      "timestamp": "SNAPSHOT-DATE"
+    },
+    "style": "dark",
+    "tags": [],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "2019-12-25T14:53:45.291Z",
+      "to": "2020-06-25T14:53:45.292Z",
+      "raw": {
+        "from": "now-6M",
+        "to": "now"
+      }
+    },
+    "timepicker": {
+      "refresh_intervals": []
+    },
+    "timezone": "",
+    "title": "DASHBOARD-NAME",
+    "variables": {
+      "list": []
+    }
+  },
+  "name": "SNAPSHOT-NAME",
+  "expires": 0
+}
+
