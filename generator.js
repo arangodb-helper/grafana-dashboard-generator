@@ -1,55 +1,192 @@
 const _ = require("lodash");
+const strftime = require("./strftime");
 const fs = require("fs");
 
-const query = fs.read("./queries/all-branches.aql");
-const panelsT = require("./templates/panels.json");
-const fieldsT = require("./templates/fields.json");
-const dashboardT = require("./templates/dashboard.json");
+const generateDashboard = function(cfg) {
+  const dashboardT = cfg.dashboard;
+  const panelsT = cfg.panels;
+  const fieldsT = cfg.fields;
 
-const data = db._query(query, { branches: [
-  "3.4", "3.5", "3.6", "3.7", "devel"
-]}).toArray();
+  // print(cfg.query);
+  // print(cfg.data);
 
-const panels = [];
-let pid = 1;
+  const data = db._query(cfg.query, cfg.data).toArray();
+  print(`INFO ${cfg.title} has ${data.length} entries`);
 
-for (let d of data) {
-  const x = (pid - 1) % 2;
-  const y = (pid - 1 - x) / 2;
+  const panels = [];
+  let pid = 1;
 
-  const panel = _.merge({}, panelsT);
-  panel.id = pid++;
+  for (let d of data) {
+    const x = (pid - 1) % 2;
+    const y = (pid - 1 - x) / 2;
 
-  const fields = [];
+    const panel = _.merge({}, panelsT);
+    panel.id = pid++;
 
-  for (let l of d.list) {
-    const obj = _.merge({}, fieldsT);
-    obj.fields[0].name = l.configuration;
-    obj.fields[0].values = l.values;
-    obj.fields[1].values = l.times;
-    obj.name = l.configuration;
+    const fields = [];
 
-    fields.push(obj);
+    for (let l of d.list) {
+      const obj = _.merge({}, fieldsT);
+      obj.fields[0].name = l.configuration;
+      obj.fields[0].values = l.values;
+      obj.fields[1].values = l.times;
+      obj.name = l.configuration;
+
+      fields.push(obj);
+    }
+
+    panel.gridPos.x = panel.gridPos.w * x;
+    panel.gridPos.y = panel.gridPos.h * y;
+    panel.title = d.test;
+    panel.snapshotData = fields;
+    panels.push(panel);
   }
 
-  panel.gridPos.x = panel.gridPos.w * x;
-  panel.gridPos.y = panel.gridPos.h * y;
-  panel.title = d.test;
-  panel.snapshotData = fields;
-  panels.push(panel);
+  const dashboard = _.merge({}, dashboardT);
+  dashboard.key = cfg.key;
+  dashboard.deleteKey = cfg.key + "-delete";
+  dashboard.name = cfg.title;
+  dashboard.dashboard.title = cfg.title;
+  dashboard.dashboard.panels = panels;
+
+  return dashboard;
+};
+
+const nowDate = new Date();
+const now = nowDate.getTime();
+
+const writeSnapshot = function(file, definition, reps) {
+  const dashboard = generateDashboard(definition);
+  let text = JSON.stringify(dashboard);
+
+  for (let key in reps) {
+    let find = "{{" + key + "}}";
+    let re = new RegExp(find, 'g');
+    text = text.replace(re, reps[key]);
+  }
+
+  fs.writeFileSync(file, text);
 }
 
-const dashboard = _.merge({}, dashboardT);
-dashboard.key = "simple-performance-single-server";
-dashboard.deleteKey = "simple-performance-single-server-delete";
-dashboard.name = "Simple - Single Server";
-dashboard.dashboard.title = "Simple - Single Server";
-dashboard.dashboard.panels = panels;
+let intervals = [
+  {
+    ms: 6 * 30 * 24 * 3600 * 1000,
+    title: "Simple - Single Server - 6 Months",
+    key: "simple-performance-single-server-6-months",
+    file: "single-server-6-months.json",
+    timeRange: "6M"
+  },
+  {
+    ms: 1 * 30 * 24 * 3600 * 1000,
+    title: "Simple - Single Server - 1 Month",
+    key: "simple-performance-single-server-1-month",
+    file: "single-server-1-month.json",
+    timeRange: "1M"
+  },
+  {
+    ms: 14 * 24 * 3600 * 1000,
+    title: "Simple - Single Server - 2 Weeks",
+    key: "simple-performance-single-server-2-weeks",
+    file: "single-server-2-weeks.json",
+    timeRange: "14d"
+  },
+  {
+    ms: 2 * 24 * 3600 * 1000,
+    title: "Simple - Single Server - 2 Days",
+    key: "simple-performance-single-server-2-days",
+    file: "single-server-2-days.json",
+    timeRange: "2d"
+  },
+];
 
-fs.writeFileSync("snapshot.json", JSON.stringify(dashboard));
+const allTime = (db._query(`
+  FOR p IN simple
+    FILTER p.size.size == 'big'
+       and p.configuration.mode == 'singleserver'
+    SORT p.ms ASC
+    LIMIT 1
+    RETURN p.ms
+`).toArray())[0];
 
-// SNAPSHOT-LINK
-// https://grafana.arangodb.biz/d/UVAhBwiMk/performance-single-server?orgId=3
+const allInterval = Math.floor((now - allTime) / (1000 * 60 * 60 * 24));
 
-// SNAPSHOT-DATE
-// 2020-06-25T14:53:41.228Z
+intervals.push({
+  ms: (now - allTime),
+  title: "Simple - Single Server - All Time",
+  key: "simple-performance-single-server-all-time",
+  file: "single-server-all-time.json",
+  timeRange: allInterval + "d"
+});
+
+for (let cfg of intervals) {
+  let startDate = now - cfg.ms;
+  let stopDate = now;
+
+  let versions = db._query(`
+    FOR p IN simple
+      FILTER p.size.size == 'big'
+         and p.configuration.mode == 'singleserver'
+         and p.ms > @from and p.ms <= @to
+      RETURN distinct p.configuration.version
+  `, { from: startDate, to: stopDate }).toArray();
+
+  writeSnapshot(cfg.file, {
+    title: cfg.title,
+    key: cfg.key,
+
+    dashboard: require("./templates/dashboard.json"),
+    panels: require("./templates/panels.json"),
+    fields: require("./templates/fields.json"),
+
+    query: fs.read("./queries/given-versions.aql"),
+    data: {
+      versions: versions,
+      size: "big",
+      mode: "singleserver",
+      from: startDate,
+      to: stopDate
+    }
+  },
+  {
+    TIME_RANGE: cfg.timeRange,
+    DASHBOARD_NAME: cfg.title,
+    SNAPSHOT_NAME: cfg.title,
+    FROM_RANGE: strftime('%FT%TZ', new Date(nowDate - cfg.ms)),
+    TO_RANGE:  strftime('%FT%TZ', nowDate)
+  });
+}
+
+writeSnapshot("cluster.json", {
+  title: "Simple - Cluster",
+  key: "simple-performance-cluster",
+
+  dashboard: require("./templates/dashboard.json"),
+  panels: require("./templates/panels.json"),
+  fields: require("./templates/fields.json"),
+
+  query: fs.read("./queries/given-versions.aql"),
+  data: {
+    versions: [ "3.4", "3.5", "3.6", "3.7", "devel" ],
+    size: "medium",
+    mode: "cluster",
+    from: now - 6 * 30 * 24 * 3600 * 1000,
+    to: now
+  }
+});
+
+writeSnapshot("single-cluster.json", {
+  title: "Simple - Single Server vs. Cluster (devel)",
+  key: "simple-performance-singleserver-cluster-devel",
+
+  dashboard: require("./templates/dashboard.json"),
+  panels: require("./templates/panels.json"),
+  fields: require("./templates/fields.json"),
+
+  query: fs.read("./queries/compare-single-cluster.aql"),
+  data: {
+    version: "devel",
+    size: "medium",
+    from: now - 6 * 30 * 24 * 3600 * 1000,
+    to: now
+  }
+});

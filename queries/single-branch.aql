@@ -1,9 +1,9 @@
-FOR p IN raw
+FOR p IN simple
   FILTER p.ms >= @start
      AND p.size.size == 'big'
-     AND p.configuration.mode == 'single'
-     AND p.configuration.name == '3.4'
+     AND p.configuration.version == '3.4'
      AND p.configuration.edition == 'enterprise'
+     AND p.configuration.mode == 'singleserver'
   COLLECT
     test = p.test.name
   INTO

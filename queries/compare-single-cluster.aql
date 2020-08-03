@@ -1,13 +1,14 @@
 LET times = (FOR p IN simple
-  FILTER p.size.size == 'big'
+  FILTER p.size.size == @size
      AND p.configuration.edition == 'enterprise'
-     AND p.configuration.mode == 'singleserver'
-     AND p.configuration.version in @branches
+     AND p.configuration.mode in ['singleserver', 'cluster']
+     AND p.configuration.version == @version
+     AND p.ms > @from and p.ms <= @to
   SORT
     p.ms
   COLLECT
     test = p.test.name,
-    configuration = p.configuration.version
+    configuration = p.configuration.mode
   INTO
     list = [ p.ms, p.test.median ]
   RETURN {

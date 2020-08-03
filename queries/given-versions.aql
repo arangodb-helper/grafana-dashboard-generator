@@ -1,8 +1,9 @@
 LET times = (FOR p IN simple
-  FILTER p.size.size == 'big'
+  FILTER p.size.size == @size
      AND p.configuration.edition == 'enterprise'
-     AND p.configuration.mode == 'singleserver'
-     AND p.configuration.version in @branches
+     AND p.configuration.mode == @mode
+     AND p.configuration.version in @versions
+     AND p.ms > @from and p.ms <= @to
   SORT
     p.ms
   COLLECT

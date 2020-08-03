@@ -16,10 +16,10 @@
       "list": []
     },
     "time": {
-      "from": "2019-12-25T14:53:45.291Z",
-      "to": "2020-06-25T14:53:45.292Z",
+      "from": "{{FROM_RANGE}}",
+      "to": "{{TO_RANGE}}",
       "raw": {
-        "from": "now-6M",
+        "from": "now-{{TIME_RANGE}}",
         "to": "now"
       }
     },
@@ -27,12 +27,12 @@
       "refresh_intervals": []
     },
     "timezone": "",
-    "title": "DASHBOARD-NAME",
+    "title": "{{DASHBOARD_NAME}}",
     "variables": {
       "list": []
     }
   },
-  "name": "SNAPSHOT-NAME",
+  "name": "{{SNAPSHOT_NAME}}",
   "expires": 0
 }
 
