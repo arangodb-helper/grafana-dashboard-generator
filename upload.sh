@@ -14,6 +14,7 @@ EOF
     -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
     -H 'content-type: application/json' \
     -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
+    -k \
     -X DELETE
   echo
 
@@ -22,6 +23,7 @@ EOF
     -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
     -H 'content-type: application/json' \
     -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
+    -k \
     --data-binary @$b \
     --compressed
   echo
@@ -32,6 +34,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots/simple-performance-cluster' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
+  -k \
   -X DELETE
 echo
 
@@ -40,6 +43,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
+  -k \
   --data-binary @cluster.json \
   --compressed
 echo
@@ -49,6 +53,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
+  -k \
   -X DELETE
 echo
 
@@ -57,6 +62,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
+  -k \
   --data-binary @single-cluster.json \
   --compressed
 echo
