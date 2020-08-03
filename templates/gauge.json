@@ -1,0 +1,41 @@
+{
+  "type": "bargauge",
+  "title": "PANEL TITLE",
+  "id": 0,
+
+  "maxPerRow": 1,
+  "gridPos": {
+    "h": 12,
+    "w": 22,
+    "x": 0,
+    "y": 0
+  },
+
+  "options": {
+    "displayMode": "lcd",
+    "fieldOptions": {
+      "calcs": [
+        "mean"
+      ],
+      "defaults": {
+        "decimals": 4,
+        "mappings": [],
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            {
+              "color": "green",
+              "value": null
+            }
+          ]
+        },
+        "title": "",
+        "unit": "s"
+      },
+      "overrides": [],
+      "values": false
+    },
+    "orientation": "horizontal",
+    "showUnfilled": true
+  }
+}

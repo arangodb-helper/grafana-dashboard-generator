@@ -17,8 +17,8 @@ const generateDashboard = function(cfg) {
   let pid = 1;
 
   for (let d of data) {
-    const x = (pid - 1) % 2;
-    const y = (pid - 1 - x) / 2;
+    const x = (pid - 1) % cfg.perRows;
+    const y = (pid - 1 - x) / cfg.perRows;
 
     const panel = _.merge({}, panelsT);
     panel.id = pid++;
@@ -73,28 +73,28 @@ let intervals = [
     ms: 6 * 30 * 24 * 3600 * 1000,
     title: "Simple - Single Server - 6 Months",
     key: "simple-performance-single-server-6-months",
-    file: "single-server-6-months.json",
+    file: "single-server-6-months",
     timeRange: "6M"
   },
   {
     ms: 1 * 30 * 24 * 3600 * 1000,
     title: "Simple - Single Server - 1 Month",
     key: "simple-performance-single-server-1-month",
-    file: "single-server-1-month.json",
+    file: "single-server-1-month",
     timeRange: "1M"
   },
   {
     ms: 14 * 24 * 3600 * 1000,
     title: "Simple - Single Server - 2 Weeks",
     key: "simple-performance-single-server-2-weeks",
-    file: "single-server-2-weeks.json",
+    file: "single-server-2-weeks",
     timeRange: "14d"
   },
   {
     ms: 2 * 24 * 3600 * 1000,
     title: "Simple - Single Server - 2 Days",
     key: "simple-performance-single-server-2-days",
-    file: "single-server-2-days.json",
+    file: "single-server-2-days",
     timeRange: "2d"
   },
 ];
@@ -114,46 +114,49 @@ intervals.push({
   ms: (now - allTime),
   title: "Simple - Single Server - All Time",
   key: "simple-performance-single-server-all-time",
-  file: "single-server-all-time.json",
+  file: "single-server-all-time",
   timeRange: allInterval + "d"
 });
 
 for (let cfg of intervals) {
-  let startDate = now - cfg.ms;
-  let stopDate = now;
+  for (let panel of ["trend", "gauge"]) {
+    let startDate = now - cfg.ms;
+    let stopDate = now;
 
-  let versions = db._query(`
-    FOR p IN simple
-      FILTER p.size.size == 'big'
-         and p.configuration.mode == 'singleserver'
-         and p.ms > @from and p.ms <= @to
-      RETURN distinct p.configuration.version
-  `, { from: startDate, to: stopDate }).toArray();
+    let versions = db._query(`
+      FOR p IN simple
+        FILTER p.size.size == 'big'
+           and p.configuration.mode == 'singleserver'
+           and p.ms > @from and p.ms <= @to
+        RETURN distinct p.configuration.version
+    `, { from: startDate, to: stopDate }).toArray();
 
-  writeSnapshot(cfg.file, {
-    title: cfg.title,
-    key: cfg.key,
+    writeSnapshot(cfg.file + "-" + panel + ".json", {
+      title: cfg.title + " - " + panel,
+      key: cfg.key + "-" + panel,
+      perRows: (panel === "trend") ? 2 : 1,
 
-    dashboard: require("./templates/dashboard.json"),
-    panels: require("./templates/panels.json"),
-    fields: require("./templates/fields.json"),
+      dashboard: require("./templates/dashboard.json"),
+      panels: require("./templates/" + panel + ".json"),
+      fields: require("./templates/fields.json"),
 
-    query: fs.read("./queries/given-versions.aql"),
-    data: {
-      versions: versions,
-      size: "big",
-      mode: "singleserver",
-      from: startDate,
-      to: stopDate
-    }
-  },
-  {
-    TIME_RANGE: cfg.timeRange,
-    DASHBOARD_NAME: cfg.title,
-    SNAPSHOT_NAME: cfg.title,
-    FROM_RANGE: strftime('%FT%TZ', new Date(nowDate - cfg.ms)),
-    TO_RANGE:  strftime('%FT%TZ', nowDate)
-  });
+      query: fs.read("./queries/given-versions.aql"),
+      data: {
+        versions: versions,
+        size: "big",
+        mode: "singleserver",
+        from: startDate,
+        to: stopDate
+      }
+    },
+    {
+      TIME_RANGE: cfg.timeRange,
+      DASHBOARD_NAME: cfg.title,
+      SNAPSHOT_NAME: cfg.title,
+      FROM_RANGE: strftime('%FT%TZ', new Date(nowDate - cfg.ms)),
+      TO_RANGE:  strftime('%FT%TZ', nowDate)
+    });
+  }
 }
 
 writeSnapshot("cluster.json", {
@@ -161,7 +164,7 @@ writeSnapshot("cluster.json", {
   key: "simple-performance-cluster",
 
   dashboard: require("./templates/dashboard.json"),
-  panels: require("./templates/panels.json"),
+  panels: require("./templates/trend.json"),
   fields: require("./templates/fields.json"),
 
   query: fs.read("./queries/given-versions.aql"),
@@ -179,7 +182,7 @@ writeSnapshot("single-cluster.json", {
   key: "simple-performance-singleserver-cluster-devel",
 
   dashboard: require("./templates/dashboard.json"),
-  panels: require("./templates/panels.json"),
+  panels: require("./templates/trend.json"),
   fields: require("./templates/fields.json"),
 
   query: fs.read("./queries/compare-single-cluster.aql"),

@@ -1,4 +1,8 @@
 {
+  "type": "graph",
+  "title": "PANEL TITLE",
+  "id": 0,
+
   "bars": false,
   "dashLength": 10,
   "dashes": false,
@@ -12,7 +16,6 @@
     "y": 0
   },
   "hiddenSeries": false,
-  "id": 0,
   "legend": {
     "avg": false,
     "current": false,
@@ -44,13 +47,11 @@
   "timeFrom": null,
   "timeRegions": [],
   "timeShift": null,
-  "title": "PANEL TITLE",
   "tooltip": {
     "shared": true,
     "sort": 0,
     "value_type": "individual"
   },
-  "type": "graph",
   "xaxis": {
     "buckets": null,
     "mode": "time",
