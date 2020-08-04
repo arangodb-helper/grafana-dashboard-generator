@@ -17,8 +17,8 @@ const generateDashboard = function(cfg) {
   let pid = 1;
 
   for (let d of data) {
-    const x = (pid - 1) % cfg.perRows;
-    const y = (pid - 1 - x) / cfg.perRows;
+    const x = (pid - 1) % cfg.perRow;
+    const y = (pid - 1 - x) / cfg.perRow;
 
     const panel = _.merge({}, panelsT);
     panel.id = pid++;
@@ -134,7 +134,7 @@ for (let cfg of intervals) {
     writeSnapshot(cfg.file + "-" + panel + ".json", {
       title: cfg.title + " - " + panel,
       key: cfg.key + "-" + panel,
-      perRows: (panel === "trend") ? 2 : 1,
+      perRow: (panel === "trend") ? 2 : 1,
 
       dashboard: require("./templates/dashboard.json"),
       panels: require("./templates/" + panel + ".json"),
