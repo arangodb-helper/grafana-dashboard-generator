@@ -19,6 +19,7 @@ EOF
       echo "Uploading $file"
 
       curl "https://grafana.arangodb.biz/api/snapshots/$a-${panel}" \
+        -s \
         -H 'accept: application/json, text/plain, */*' \
         -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
         -H 'content-type: application/json' \
@@ -28,6 +29,7 @@ EOF
       echo
 
       curl 'https://grafana.arangodb.biz/api/snapshots' \
+        -s \
         -H 'accept: application/json, text/plain, */*' \
         -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
         -H 'content-type: application/json' \
@@ -44,6 +46,7 @@ EOF
 done
 
 curl 'https://grafana.arangodb.biz/api/snapshots/simple-performance-cluster' \
+  -s \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
@@ -53,6 +56,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots/simple-performance-cluster' \
 echo
 
 curl 'https://grafana.arangodb.biz/api/snapshots' \
+  -s \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
@@ -63,6 +67,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots' \
 echo
 
 curl 'https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster' \
+  -s \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
@@ -72,6 +77,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver
 echo
 
 curl 'https://grafana.arangodb.biz/api/snapshots' \
+  -s \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
