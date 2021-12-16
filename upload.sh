@@ -19,7 +19,7 @@ EOF
       echo "Uploading $file"
 
       url="https://grafana.arangodb.biz/api/snapshots/$a-${panel}"
-      echo $url >> $logfile
+      echo -e "\n\n$url" >> $logfile
       curl $url -s -k \
         -H 'accept: application/json, text/plain, */*' \
         -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
@@ -29,7 +29,7 @@ EOF
       echo
 
       url='https://grafana.arangodb.biz/api/snapshots'
-      echo $url >> $logfile
+      echo -e "\n\n$url" >> $logfile
       curl $url -s -k \
       curl 'https://grafana.arangodb.biz/api/snapshots' \
         -H 'accept: application/json, text/plain, */*' \
@@ -47,7 +47,7 @@ EOF
 done
 
 url='https://grafana.arangodb.biz/api/snapshots/simple-performance-cluster'
-echo $url >> $logfile
+echo -e "\n\n$url" >> $logfile
 curl $url -s -k \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
@@ -57,7 +57,7 @@ curl $url -s -k \
 echo
 
 url='https://grafana.arangodb.biz/api/snapshots'
-echo $url >> $logfile
+echo -e "\n\n$url" >> $logfile
 curl $url -s -k \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
@@ -68,7 +68,7 @@ curl $url -s -k \
 echo
 
 url='https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster'
-echo $url >> $logfile
+echo -e "\n\n$url" >> $logfile
 curl $url -s -k \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
@@ -78,7 +78,7 @@ curl $url -s -k \
 echo
 
 url='https://grafana.arangodb.biz/api/snapshots'
-echo $url >> $logfile
+echo -e "\n\n$url" >> $logfile
 curl $url -s -k \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
