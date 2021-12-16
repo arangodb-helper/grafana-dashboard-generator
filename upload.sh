@@ -24,7 +24,7 @@ EOF
         -H 'content-type: application/json' \
         -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
         -k \
-        -X DELETE || failed=true >> $logfile
+        -X DELETE >> $logfile || failed=true
       echo
 
       curl 'https://grafana.arangodb.biz/api/snapshots' \
@@ -34,7 +34,7 @@ EOF
         -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
         -k \
         --data-binary @${file} \
-        --compressed || failed=true >> $logfile
+        --compressed >> $logfile || failed=true
       echo
     else
       echo "ERROR: $file missing"
@@ -49,7 +49,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots/simple-performance-cluster' \
   -H 'content-type: application/json' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
   -k \
-  -X DELETE || failed=true >> $logfile
+  -X DELETE >> $logfile || failed=true
 echo
 
 curl 'https://grafana.arangodb.biz/api/snapshots' \
@@ -59,7 +59,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
   -k \
   --data-binary @cluster.json \
-  --compressed || failed=true >> $logfile
+  --compressed >> $logfile || failed=true
 echo
 
 curl 'https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster' \
@@ -68,7 +68,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver
   -H 'content-type: application/json' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
   -k \
-  -X DELETE || failed=true >> $logfile
+  -X DELETE >> $logfile || failed=true
 echo
 
 curl 'https://grafana.arangodb.biz/api/snapshots' \
@@ -78,7 +78,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
   -k \
   --data-binary @single-cluster.json \
-  --compressed || failed=true >> $logfile
+  --compressed >> $logfile || failed=true
 echo
 
 if grep -qi fail $logfile; then
