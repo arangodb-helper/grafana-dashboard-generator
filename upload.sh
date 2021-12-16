@@ -67,26 +67,26 @@ curl $url -s -k \
   --compressed >> $logfile || failed=true
 echo
 
-url='https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster'
-echo "\n\n$url" >> $logfile
-curl $url -s -k \
-  -H 'accept: application/json, text/plain, */*' \
-  -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
-  -H 'content-type: application/json' \
-  -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-  -X DELETE >> $logfile || failed=true
-echo
+# url='https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster'
+# echo "\n\n$url" >> $logfile
+# curl $url -s -k \
+#   -H 'accept: application/json, text/plain, */*' \
+#   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
+#   -H 'content-type: application/json' \
+#   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
+#   -X DELETE >> $logfile || failed=true
+# echo
 
-url='https://grafana.arangodb.biz/api/snapshots'
-echo "\n\n$url" >> $logfile
-curl $url -s -k \
-  -H 'accept: application/json, text/plain, */*' \
-  -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
-  -H 'content-type: application/json' \
-  -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-  --data-binary @single-cluster.json \
-  --compressed >> $logfile || failed=true
-echo
+# url='https://grafana.arangodb.biz/api/snapshots'
+# echo "\n\n$url" >> $logfile
+# curl $url -s -k \
+#   -H 'accept: application/json, text/plain, */*' \
+#   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
+#   -H 'content-type: application/json' \
+#   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
+#   --data-binary @single-cluster.json \
+#   --compressed >> $logfile || failed=true
+# echo
 
 if grep -B 3 -i fail $logfile; then
     rm -f $logfile
