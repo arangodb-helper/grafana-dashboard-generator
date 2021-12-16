@@ -87,7 +87,7 @@ curl 'https://grafana.arangodb.biz/api/snapshots' \
   --compressed >> $logfile || failed=true
 echo
 
-if grep -qi fail $logfile; then
+if grep -B 3 -i fail $logfile; then
     rm -f $logfile
     exit 1
 fi
