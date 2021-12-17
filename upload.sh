@@ -25,7 +25,7 @@ EOF
         -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
         -H 'content-type: application/json' \
         -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-        -X DELETE >> $logfile || failed=true
+        -X DELETE
       echo
 
       url='https://grafana.arangodb.biz/api/snapshots'
@@ -53,7 +53,7 @@ curl $url -s -k \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-  -X DELETE >> $logfile || failed=true
+  -X DELETE
 echo
 
 url='https://grafana.arangodb.biz/api/snapshots'
@@ -67,15 +67,15 @@ curl $url -s -k \
   --compressed >> $logfile || failed=true
 echo
 
-# url='https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster'
-# echo "\n\n$url" >> $logfile
-# curl $url -s -k \
-#   -H 'accept: application/json, text/plain, */*' \
-#   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
-#   -H 'content-type: application/json' \
-#   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-#   -X DELETE >> $logfile || failed=true
-# echo
+url='https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster'
+echo "\n\n$url" >> $logfile
+curl $url -s -k \
+  -H 'accept: application/json, text/plain, */*' \
+  -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
+  -H 'content-type: application/json' \
+  -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
+  -X DELETE
+echo
 
 # url='https://grafana.arangodb.biz/api/snapshots'
 # echo "\n\n$url" >> $logfile
