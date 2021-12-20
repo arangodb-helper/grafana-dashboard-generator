@@ -1,8 +1,10 @@
+/* global db, print */
+
 const _ = require("lodash");
 const strftime = require("./strftime");
 const fs = require("fs");
 
-const generateDashboard = function(cfg) {
+const generateDashboard = function (cfg) {
   const dashboardT = cfg.dashboard;
   const panelsT = cfg.panels;
   const fieldsT = cfg.fields;
@@ -54,8 +56,9 @@ const generateDashboard = function(cfg) {
 
 const nowDate = new Date();
 const now = nowDate.getTime();
+const isoNow = nowDate.toISOString();
 
-const writeSnapshot = function(file, definition, reps) {
+const writeSnapshot = function (file, definition, reps) {
   const dashboard = generateDashboard(definition);
   let text = JSON.stringify(dashboard);
 
@@ -66,7 +69,7 @@ const writeSnapshot = function(file, definition, reps) {
   }
 
   fs.writeFileSync(file, text);
-}
+};
 
 let intervals = [
   {
@@ -96,7 +99,7 @@ let intervals = [
     key: "simple-performance-single-server-2-days",
     file: "single-server-2-days",
     timeRange: "2d"
-  },
+  }
 ];
 
 const allTime = (db._query(`
@@ -129,7 +132,10 @@ for (let cfg of intervals) {
            and p.configuration.mode == 'singleserver'
            and p.ms > @from and p.ms <= @to
         RETURN distinct p.configuration.version
-    `, { from: startDate, to: stopDate }).toArray();
+    `, {
+         from: startDate,
+         to: stopDate
+       }).toArray();
 
     writeSnapshot(cfg.file + "-" + panel + ".json", {
       title: cfg.title + " - " + panel,
@@ -150,14 +156,19 @@ for (let cfg of intervals) {
       }
     },
     {
-      TIME_RANGE: cfg.timeRange,
       DASHBOARD_NAME: cfg.title,
       SNAPSHOT_NAME: cfg.title,
+      SNAPSHOT_LINK: (panel === 'gauge') ? 'https://grafana.arangodb.biz/d/ZKP7WpVMz/performance-gauge?orgId=3' : 'https://grafana.arangodb.biz/d/UVAhBwiMk/performance-trends?orgId=3',
+      SNAPSHOT_DATE: isoNow,
+      TIME_RANGE: cfg.timeRange,
       FROM_RANGE: strftime('%FT%TZ', new Date(nowDate - cfg.ms)),
-      TO_RANGE:  strftime('%FT%TZ', nowDate)
+      TO_RANGE: strftime('%FT%TZ', nowDate)
     });
   }
 }
+
+const daysAll = 6 * 30;
+const msAll = daysAll * 24 * 3600 * 1000;
 
 writeSnapshot("cluster.json", {
   title: "Simple - Cluster",
@@ -172,9 +183,16 @@ writeSnapshot("cluster.json", {
     versions: [ "3.4", "3.5", "3.6", "3.7", "devel" ],
     size: "medium",
     mode: "cluster",
-    from: now - 6 * 30 * 24 * 3600 * 1000,
+    from: now - msAll,
     to: now
   }
+},
+{
+  SNAPSHOT_LINK: 'https://grafana.arangodb.biz/d/UVAhBwiMk/performance-trends?orgId=3',
+  SNAPSHOT_DATE: isoNow,
+  TIME_RANGE: daysAll + "d",
+  FROM_RANGE: strftime('%FT%TZ', new Date(nowDate - msAll)),
+  TO_RANGE: strftime('%FT%TZ', nowDate)
 });
 
 writeSnapshot("single-cluster.json", {
@@ -189,7 +207,14 @@ writeSnapshot("single-cluster.json", {
   data: {
     version: "devel",
     size: "medium",
-    from: now - 6 * 30 * 24 * 3600 * 1000,
+    from: now - msAll,
     to: now
   }
+},
+{
+  SNAPSHOT_LINK: 'https://grafana.arangodb.biz/d/UVAhBwiMk/performance-trends?orgId=3',
+  SNAPSHOT_DATE: isoNow,
+  TIME_RANGE: daysAll + "d",
+  FROM_RANGE: strftime('%FT%TZ', new Date(nowDate - msAll)),
+  TO_RANGE: strftime('%FT%TZ', nowDate)
 });

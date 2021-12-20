@@ -2,7 +2,6 @@
 failed=false
 logfile=/tmp/logfile.$$
 
-if false; then
 for panel in trend gauge; do
   (
 cat << 'EOF'
@@ -71,8 +70,6 @@ curl $url -s -k \
   --data-binary @cluster.json \
   --compressed >> $logfile || failed=true
 echo
-
-fi
 
 url='https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster'
 echo "\n\n$url" >> $logfile
