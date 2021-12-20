@@ -2,6 +2,7 @@
 failed=false
 logfile=/tmp/logfile.$$
 
+if false; then
 for panel in trend gauge; do
   (
 cat << 'EOF'
@@ -27,6 +28,8 @@ EOF
         -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
         -X DELETE
       echo
+
+      sleep 5
 
       url='https://grafana.arangodb.biz/api/snapshots'
       echo "\n\n$url" >> $logfile
@@ -56,6 +59,8 @@ curl $url -s -k \
   -X DELETE
 echo
 
+sleep 5
+
 url='https://grafana.arangodb.biz/api/snapshots'
 echo "\n\n$url" >> $logfile
 curl $url -s -k \
@@ -67,6 +72,8 @@ curl $url -s -k \
   --compressed >> $logfile || failed=true
 echo
 
+fi
+
 url='https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster'
 echo "\n\n$url" >> $logfile
 curl $url -s -k \
@@ -77,19 +84,21 @@ curl $url -s -k \
   -X DELETE
 echo
 
-# url='https://grafana.arangodb.biz/api/snapshots'
-# echo "\n\n$url" >> $logfile
-# curl $url -s -k \
-#   -H 'accept: application/json, text/plain, */*' \
-#   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
-#   -H 'content-type: application/json' \
-#   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-#   --data-binary @single-cluster.json \
-#   --compressed >> $logfile || failed=true
-# echo
+sleep 5
+
+url='https://grafana.arangodb.biz/api/snapshots'
+echo "\n\n$url" >> $logfile
+curl $url -s -k \
+  -H 'accept: application/json, text/plain, */*' \
+  -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
+  -H 'content-type: application/json' \
+  -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
+  --data-binary @single-cluster.json \
+  --compressed >> $logfile || failed=true
+echo
 
 if grep -B 3 -i fail $logfile; then
-    rm -f $logfile
+    #rm -f $logfile
     exit 1
 fi
 

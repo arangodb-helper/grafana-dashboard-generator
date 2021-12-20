@@ -1,6 +1,6 @@
 {
   "type": "graph",
-  "title": "PANEL TITLE",
+  "title": "{{PANEL TITLE}}",
   "id": 0,
 
   "bars": false,

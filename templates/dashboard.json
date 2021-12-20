@@ -7,8 +7,8 @@
     "refresh": false,
     "schemaVersion": 22,
     "snapshot": {
-      "originalUrl": "SNAPSHOT-LINK",
-      "timestamp": "SNAPSHOT-DATE"
+      "originalUrl": "{{SNAPSHOT_LINK}}",
+      "timestamp": "{{SNAPSHOT_DATE}}"
     },
     "style": "dark",
     "tags": [],

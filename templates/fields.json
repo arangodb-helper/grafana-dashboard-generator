@@ -2,7 +2,7 @@
   "fields": [
     {
       "config": {},
-      "name": "NAME1",
+      "name": "{{NAME}}",
       "type": "number",
       "values": []
     },
@@ -13,5 +13,5 @@
       "values": []
     }
   ],
-  "name": "NAME1"
+  "name": "{{NAME}}"
 }

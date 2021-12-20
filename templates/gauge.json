@@ -1,6 +1,6 @@
 {
   "type": "bargauge",
-  "title": "PANEL TITLE",
+  "title": "{{PANEL TITLE}}",
   "id": 0,
 
   "maxPerRow": 1,
