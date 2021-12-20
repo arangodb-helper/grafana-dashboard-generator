@@ -1,6 +1,36 @@
-#!/bin/sh
+#!/bin/bash
 failed=false
 logfile=/tmp/logfile.$$
+curllog=/tmp/curllog.$$
+
+function logDelete {
+  url=$1
+
+  echo "DELETE $url"
+  cat $curllog
+  echo
+  echo
+
+  (
+    echo "DELETE $url"
+    echo
+  ) >> $logfile
+}
+
+function logCreate {
+  url=$1
+
+  echo "POST $url"
+  cat $curllog
+  echo
+  echo
+
+  (
+    echo "DELETE $url"
+    cat $curllog
+    echo
+  ) >> $logfile
+}
 
 for panel in trend gauge; do
   (
@@ -19,28 +49,25 @@ EOF
       echo "Uploading $file"
 
       url="https://grafana.arangodb.biz/api/snapshots/$a-${panel}"
-      echo "\n\n$url" >> $logfile
       curl $url -s -k \
         -H 'accept: application/json, text/plain, */*' \
         -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
         -H 'content-type: application/json' \
         -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-        -X DELETE
-      echo
+        -X DELETE > $curllog
+      logDelete $url
 
       sleep 5
 
       url='https://grafana.arangodb.biz/api/snapshots'
-      echo "\n\n$url" >> $logfile
       curl $url -s -k \
-      curl 'https://grafana.arangodb.biz/api/snapshots' \
         -H 'accept: application/json, text/plain, */*' \
         -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
         -H 'content-type: application/json' \
         -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
         --data-binary @${file} \
-        --compressed >> $logfile || failed=true
-      echo
+        --compressed > $curllog || failed=true
+      logCreate $url
     else
       echo "ERROR: $file missing"
       failed=true
@@ -48,54 +75,56 @@ EOF
   done
 done
 
+echo "Uploading simple-performance-cluster"
+
 url='https://grafana.arangodb.biz/api/snapshots/simple-performance-cluster'
-echo "\n\n$url" >> $logfile
 curl $url -s -k \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-  -X DELETE
-echo
+  -X DELETE > $curllog
+logDelete $url
 
 sleep 5
 
 url='https://grafana.arangodb.biz/api/snapshots'
-echo "\n\n$url" >> $logfile
 curl $url -s -k \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
   --data-binary @cluster.json \
-  --compressed >> $logfile || failed=true
-echo
+  --compressed > $curllog || failed=true
+logCreate $url
 
-url='https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster'
-echo "\n\n$url" >> $logfile
+echo "Uploading simple-performance-singleserver-cluster-devel"
+
+url='https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster-devel'
 curl $url -s -k \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-  -X DELETE
-echo
+  -X DELETE > $curllog
+logDelete $url
 
 sleep 5
 
 url='https://grafana.arangodb.biz/api/snapshots'
-echo "\n\n$url" >> $logfile
 curl $url -s -k \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
   -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
   --data-binary @single-cluster.json \
-  --compressed >> $logfile || failed=true
-echo
+  --compressed > $curllog || failed=true
+logCreate $url
+
+rm -f $curllog
 
 if grep -B 3 -i fail $logfile; then
-    #rm -f $logfile
+    rm -f $logfile
     exit 1
 fi
 
@@ -104,4 +133,3 @@ rm -f $logfile
 if test "$failed" = "true"; then
     exit 1
 fi
-
