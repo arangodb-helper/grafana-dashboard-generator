@@ -48,8 +48,8 @@ EOF
     if test -f $file; then
       echo "Uploading $file"
 
-      url="https://grafana.arangodb.biz/api/snapshots/$a-${panel}"
-      curl $url -s -k \
+      url="https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots/$a-${panel}"
+      curl $url -s -k -v \
         -H 'accept: application/json, text/plain, */*' \
         -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
         -H 'content-type: application/json' \
@@ -59,8 +59,8 @@ EOF
 
       sleep 5
 
-      url='https://grafana.arangodb.biz/api/snapshots'
-      curl $url -s -k \
+      url='https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots'
+      curl $url -s -k -v \
         -H 'accept: application/json, text/plain, */*' \
         -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
         -H 'content-type: application/json' \
@@ -77,8 +77,8 @@ done
 
 echo "Uploading simple-performance-cluster"
 
-url='https://grafana.arangodb.biz/api/snapshots/simple-performance-cluster'
-curl $url -s -k \
+url='https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots/simple-performance-cluster'
+curl $url -s -k -v \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
@@ -88,8 +88,8 @@ logDelete $url
 
 sleep 5
 
-url='https://grafana.arangodb.biz/api/snapshots'
-curl $url -s -k \
+url='https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots'
+curl $url -s -k -v \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
@@ -100,8 +100,8 @@ logCreate $url
 
 echo "Uploading simple-performance-singleserver-cluster-devel"
 
-url='https://grafana.arangodb.biz/api/snapshots/simple-performance-singleserver-cluster-devel'
-curl $url -s -k \
+url='https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots/simple-performance-singleserver-cluster-devel'
+curl $url -s -k -v \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
@@ -111,8 +111,8 @@ logDelete $url
 
 sleep 5
 
-url='https://grafana.arangodb.biz/api/snapshots'
-curl $url -s -k \
+url='https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots'
+curl $url -s -k -v \
   -H 'accept: application/json, text/plain, */*' \
   -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
   -H 'content-type: application/json' \
@@ -124,12 +124,16 @@ logCreate $url
 rm -f $curllog
 
 if grep -B 3 -i fail $logfile; then
+    echo "ERROR found fail in log file"
+    cat $logfile
+    rm -f $logfile
+    exit 1
+fi
+
+if test "$failed" = "true"; then
+    cat $logfile
     rm -f $logfile
     exit 1
 fi
 
 rm -f $logfile
-
-if test "$failed" = "true"; then
-    exit 1
-fi
