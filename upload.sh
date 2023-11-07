@@ -49,24 +49,13 @@ EOF
       echo "Uploading $file"
 
       url="https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots/$a-${panel}"
-      curl $url -s -k -v \
-        -H 'accept: application/json, text/plain, */*' \
-        -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
-        -H 'content-type: application/json' \
-        -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-        -X DELETE > $curllog
+      curl "$url" -s -v -k  curl_headers.txt  -X DELETE > $curllog
       logDelete $url
 
       sleep 5
 
       url='https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots'
-      curl $url -s -k -v \
-        -H 'accept: application/json, text/plain, */*' \
-        -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
-        -H 'content-type: application/json' \
-        -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-        --data-binary @${file} \
-        --compressed > $curllog || failed=true
+      curl "$url" -s -v -k  curl_headers.txt  --data-binary @${file}  --compressed > $curllog || failed=true
       logCreate $url
     else
       echo "ERROR: $file missing"
@@ -78,47 +67,25 @@ done
 echo "Uploading simple-performance-cluster"
 
 url='https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots/simple-performance-cluster'
-curl $url -s -k -v \
-  -H 'accept: application/json, text/plain, */*' \
-  -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
-  -H 'content-type: application/json' \
-  -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-  -X DELETE > $curllog
+curl "$url" -s  -v -k  curl_headers.txt  -X DELETE > $curllog
 logDelete $url
 
 sleep 5
 
 url='https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots'
-curl $url -s -k -v \
-  -H 'accept: application/json, text/plain, */*' \
-  -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
-  -H 'content-type: application/json' \
-  -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-  --data-binary @cluster.json \
-  --compressed > $curllog || failed=true
+curl $url -s  -v -k  curl_headers.txt  --data-binary @cluster.json  --compressed > $curllog || failed=true
 logCreate $url
 
 echo "Uploading simple-performance-singleserver-cluster-devel"
 
 url='https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots/simple-performance-singleserver-cluster-devel'
-curl $url -s -k -v \
-  -H 'accept: application/json, text/plain, */*' \
-  -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
-  -H 'content-type: application/json' \
-  -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-  -X DELETE > $curllog
+curl "$url" -s  -v -k  curl_headers.txt  -X DELETE > $curllog
 logDelete $url
 
 sleep 5
 
 url='https://g-dc685c4b12.grafana-workspace.eu-central-1.amazonaws.com/api/snapshots'
-curl $url -s -k -v \
-  -H 'accept: application/json, text/plain, */*' \
-  -H "x-grafana-org-id: ${GRAFANA_ORG_ID}" \
-  -H 'content-type: application/json' \
-  -H "Authorization: Bearer ${GRAFANA_API_KEY}" \
-  --data-binary @single-cluster.json \
-  --compressed > $curllog || failed=true
+curl "$url" -s  -v -k  curl_headers.txt  --data-binary @single-cluster.json  --compressed > $curllog || failed=true
 logCreate $url
 
 rm -f $curllog
