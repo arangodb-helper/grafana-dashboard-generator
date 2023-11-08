@@ -1,4 +1,5 @@
 #!/bin/bash
+curl --version
 failed=false
 logfile=/tmp/logfile.$$
 curllog=/tmp/curllog.$$
